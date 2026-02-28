@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+  <!-- PWA / Home Screen -->
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Sipyora Att."/>
+  <meta name="theme-color" content="#080814"/>
+  <meta name="description" content="Sipyora Institute — Teacher Attendance App"/>
+
+  <title>Sipyora · Attendance</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ══════════════════════════════════════
+       LOGIN SCREEN
+  ══════════════════════════════════════ -->
+  <div class="screen active" id="loginScreen">
+    <div class="login-orb orb-1"></div>
+    <div class="login-orb orb-2"></div>
+    <div class="login-orb orb-3"></div>
+
+    <div class="login-logo">
+      <div class="brand-mark">📋</div>
+      <div class="brand-name">Sip<span>yora</span></div>
+      <div class="brand-tag">Teacher · Attendance</div>
+    </div>
+
+    <div class="login-box">
+      <div class="login-box-label">Sign in to continue</div>
+
+      <div class="field">
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" id="loginEmail"
+          placeholder="your@email.com" autocomplete="email"/>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Password</label>
+        <input class="field-input" type="password" id="loginPass"
+          placeholder="••••••••" autocomplete="current-password"
+          onkeydown="if(event.key==='Enter') handleLogin()"/>
+      </div>
+
+      <div class="err-box" id="loginErr"></div>
+
+      <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
+        Sign In
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       HOME / ATTENDANCE SCREEN
+  ══════════════════════════════════════ -->
+  <div class="screen" id="homeScreen">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-content">
+        <div class="topbar-title">Sipyora</div>
+        <div class="topbar-sub" id="topbarSub">—</div>
+      </div>
+      <div class="avatar-btn" id="avatarLetter" onclick="openSheet()">T</div>
+    </div>
+
+    <!-- SCROLLABLE CONTENT -->
+    <div class="scroll-body">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="date-chip">📅 <span id="heroDateChip">—</span></div>
+        <div class="hero-greeting">Hello, <em id="heroName">Teacher</em> 👋</div>
+        <div class="hero-sub">Mark today's attendance below</div>
+      </div>
+
+      <!-- Subject Filter -->
+      <div class="sec-head">
+        <span class="sec-label">Subject</span>
+      </div>
+      <div class="chips-scroll" id="subjectChips">
+        <span style="color:var(--muted);font-size:0.82rem;padding:8px 0;">Loading…</span>
+      </div>
+
+      <!-- Grade Filter -->
+      <div class="sec-head" style="padding-top:14px;">
+        <span class="sec-label">Grade</span>
+      </div>
+      <div class="grade-scroll" id="gradeButtons">
+        <button class="grade-btn active" data-g="" onclick="filterGrade(this,'')">All</button>
+        <button class="grade-btn" data-g="6"  onclick="filterGrade(this,'6')">Grade 6</button>
+        <button class="grade-btn" data-g="7"  onclick="filterGrade(this,'7')">Grade 7</button>
+        <button class="grade-btn" data-g="8"  onclick="filterGrade(this,'8')">Grade 8</button>
+        <button class="grade-btn" data-g="9"  onclick="filterGrade(this,'9')">Grade 9</button>
+        <button class="grade-btn" data-g="10" onclick="filterGrade(this,'10')">Grade 10</button>
+        <button class="grade-btn" data-g="11" onclick="filterGrade(this,'11')">Grade 11</button>
+      </div>
+
+      <!-- Search -->
+      <div class="sec-head" style="padding-top:14px;">
+        <span class="sec-label">Students</span>
+        <span class="sec-count" id="stuCount"></span>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="search" id="stuSearch"
+          placeholder="Search by name…" autocomplete="off"
+          oninput="renderStudentList()"/>
+      </div>
+
+      <!-- Saved notice -->
+      <div id="savedNotice"></div>
+
+      <!-- Student cards -->
+      <div class="student-list" id="studentList">
+        <div class="center-msg"><div class="spinner"></div></div>
+      </div>
+
+    </div><!-- /scroll-body -->
+
+    <!-- FLOATING SAVE BAR -->
+    <div class="save-bar" id="saveBar" style="display:none;">
+      <div class="save-inner">
+        <div class="stat-group">
+          <div class="stat-item">
+            <div class="stat-num p" id="statP">0</div>
+            <div class="stat-lbl">Present</div>
+          </div>
+          <div class="vdiv"></div>
+          <div class="stat-item">
+            <div class="stat-num a" id="statA">0</div>
+            <div class="stat-lbl">Absent</div>
+          </div>
+          <div class="vdiv"></div>
+          <div class="stat-item">
+            <div class="stat-num u" id="statU">0</div>
+            <div class="stat-lbl">Unmarked</div>
+          </div>
+        </div>
+        <button class="save-btn" id="saveBtn" onclick="handleSave()">💾 Save</button>
+      </div>
+    </div>
+
+  </div><!-- /homeScreen -->
+
+</div><!-- /app -->
+
+<!-- ══════════════════════════════════════
+     PROFILE BOTTOM SHEET
+══════════════════════════════════════ -->
+<div class="sheet-bg" id="profileSheet" onclick="closeSheet(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-name" id="sheetName">Teacher</div>
+    <div class="sheet-email" id="sheetEmail">—</div>
+
+    <div class="sheet-item">
+      <span class="si-icon">📅</span>
+      <span class="si-label">Today</span>
+      <span class="si-val" id="sheetDate">—</span>
+    </div>
+    <div class="sheet-item">
+      <span class="si-icon">📚</span>
+      <span class="si-label">My Subjects</span>
+      <span class="si-val" id="sheetSubjects">—</span>
+    </div>
+    <div class="sheet-item">
+      <span class="si-icon">🏫</span>
+      <span class="si-label">My Grades</span>
+      <span class="si-val" id="sheetGrades">—</span>
+    </div>
+
+    <button class="btn-logout" onclick="handleLogout()">🚪 Sign Out</button>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ══════════════════════════════════════
+     SCRIPTS — order matters:
+     1. Firebase SDKs
+     2. firebase.js (config + helpers)
+     3. auth.js
+     4. attendance.js (data)
+     5. ui.js (rendering)
+     6. app.js (main controller)
+══════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/attendance.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
